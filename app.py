@@ -42,5 +42,25 @@ class Reel(db.Model):
 def index():
     return render_template("base.html")
 
+@app.route("/audio", methods=["GET"])
+def audio():
+    return render_template("audio.html")
+
+@app.route("/perfil", methods=["GET"])
+def perfil():
+    return render_template("perfil.html")
+
+@app.route("/imagen")
+def imagen():
+    return render_template("imagen.html")
+
+@app.route("/interacciones")
+def interacciones():
+    return render_template("interacciones.html")
+
+@app.route("/caption")  
+def caption():
+    return render_template("caption.html")
+
 if __name__ == "__main__":
     app.run(debug=True)
