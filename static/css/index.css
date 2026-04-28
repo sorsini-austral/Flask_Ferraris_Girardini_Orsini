@@ -15,3 +15,17 @@ body {
     background-clip: text;
     color: transparent;
 }
+
+/* Botón del Mini Juego */
+.btn-game {
+    background: var(--ig-gradient);
+    border-radius: 50px;
+    font-size: 1.2rem;
+    transition: transform 0.2s ease;
+    color: white !important;
+}
+
+.btn-game:hover {
+    transform: scale(1.05);
+    color: white !important;
+}
