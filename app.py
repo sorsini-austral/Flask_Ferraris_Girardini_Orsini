@@ -40,7 +40,11 @@ class Reel(db.Model):
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("base.html")
+    return render_template("index.html")
+
+@app.route("/juego", methods=["GET"])
+def juego():
+    return render_template("juego.html")
 
 @app.route("/audio", methods=["GET"])
 def audio():
