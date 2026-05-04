@@ -42,6 +42,33 @@ class Reel(db.Model):
 def index():
     return render_template("index.html")
 
+def generate_chart(x, y, type, title, xlabel, ylabel, agg=None):
+    df = pd.read_sql(Reel.query.statement, db.engine)
+    
+    if agg == 'mean':
+        df = df.groupby(x)[y].mean().reset_index()
+    elif agg == 'sum':
+        df = df.groupby(x)[y].sum().reset_index()
+        
+    plt.figure(figsize=(8,5))
+    
+    if type == 'line':
+        plt.plot(df[x], df[y])
+    elif type == 'bar':
+        plt.bar(df[x], df[y])
+    elif type == 'scatter':
+        plt.scatter(df[x], df[y], alpha=0.5)
+    else:
+        raise ValueError("Tipo de gráfico no soportado")
+    
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.tight_layout()
+    plt.savefig(f'static/plots/{title}.png')
+    plt.close() 
+    return str(title + ".png")
+
 @app.route("/juego", methods=["GET"])
 def juego():
     return render_template("juego.html")
@@ -60,6 +87,7 @@ def imagen():
 
 @app.route("/interacciones")
 def interacciones():
+    generate_chart('posting_time', 'likes', 'bar', 'Likes Totales por Horario', 'Horario', 'Total de Likes', agg='sum')
     return render_template("interacciones.html")
 
 @app.route("/caption")  
