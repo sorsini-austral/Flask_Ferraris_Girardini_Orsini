@@ -1,13 +1,47 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="text-center my-5 py-5">
+<div class="text-center my-5">
     <h2 class="fw-bold mb-3">Bienvenidos al Analizador de Reels</h2>
-    <p class="text-muted lead mb-5">Explora las distintas secciones para descubrir el secreto de la viralidad en Instagram.</p>
-
-    <!-- Botón hacia el mini juego -->
-    <a href="/juego" class="btn px-5 py-3 fw-bold shadow btn-game">
+    <p class="text-muted lead mb-4">Explora las distintas secciones para descubrir el secreto de la viralidad en Instagram.</p>
+    <a href="/juego" class="btn px-5 py-3 fw-bold shadow btn-game mb-5">
         🎮 Jugar: ¿Mi Reel será viral?
     </a>
+</div>
+
+<div class="row text-center mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 py-3">
+            <h5 class="text-muted">Total Reels</h5>
+            <h3 class="fw-bold text-primary">{{ total_reels }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 py-3">
+            <h5 class="text-muted">% Virales</h5>
+            <h3 class="fw-bold text-success">{{ viral_percentage }}%</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 py-3">
+            <h5 class="text-muted">Avg Engagement</h5>
+            <h3 class="fw-bold text-info">{{ avg_engagement }}%</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 py-3">
+            <h5 class="text-muted">Mejor Horario</h5>
+            <h3 class="fw-bold text-danger">{{ best_time }}:00</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm p-4 text-center">
+            <h5 class="mb-3 fw-bold">Viralidad a lo largo del día</h5>
+            <img src="{{ url_for('static', filename='plots/' + plot) }}" alt="Viralidad por hora" class="img-fluid rounded">
+        </div>
+    </div>
 </div>
 {% endblock %}

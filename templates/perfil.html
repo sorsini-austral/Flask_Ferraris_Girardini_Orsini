@@ -4,12 +4,22 @@
 <div class="text-center mb-5">
     <h2 class="fw-bold">Análisis del Perfil</h2>
     <p class="text-muted">¿Importa la cantidad de seguidores del creador?</p>
+    <div class="alert alert-info d-inline-block mt-3 shadow-sm border-0">
+        El mejor horario para publicar es a las <strong>{{ best_hour }}:00</strong> y el peor es a las <strong>{{ worst_hour }}:00</strong>.
+    </div>
 </div>
 
-<div class="row">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm p-5 text-center chart-placeholder">
-            <p class="text-muted mb-0">Aquí irá el gráfico de perfil...</p>
+<div class="row g-4 mb-5">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm p-4 text-center h-100">
+            <h5 class="mb-3 fw-bold">Seguidores vs Viralidad</h5>
+            <img src="{{ url_for('static', filename='plots/' + plot1) }}" alt="Seguidores vs Viralidad" class="img-fluid rounded">
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm p-4 text-center h-100">
+            <h5 class="mb-3 fw-bold">Desempeño por Horario</h5>
+            <img src="{{ url_for('static', filename='plots/' + plot2) }}" alt="Horarios" class="img-fluid rounded">
         </div>
     </div>
 </div>
