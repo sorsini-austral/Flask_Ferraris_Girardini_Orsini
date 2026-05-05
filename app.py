@@ -59,69 +59,42 @@ def index():
     df = get_df()
     # Stat cards para mostrar en el HTML
     total_reels = len(df)
-    virales = df[df['virality_score'] > 0.7]  # ajustá el umbral según el dataset
-    porcentaje_viral = round(len(virales) / total_reels * 100, 1)
+    virals = df[df['virality_score'] > 0.7]  # ajustá el umbral según el dataset
+    viral_percentage = round(len(virals) / total_reels * 100, 1)
     avg_engagement = round(df['engagement_rate'].mean() * 100, 2)
-    mejor_horario = int(df.groupby('posting_time')['virality_score'].mean().idxmax())
+    best_time = int(df.groupby('posting_time')['virality_score'].mean().idxmax())
 
     # Gráfico: viralidad promedio por horario
     fig, ax = plt.subplots(figsize=(10, 4))
-    horas = df.groupby('posting_time')['virality_score'].mean()
-    ax.plot(horas.index, horas.values, marker='o', color='#E1306C')
+    hours = df.groupby('posting_time')['virality_score'].mean()
+    ax.plot(hours.index, hours.values, marker='o', color='#E1306C')
     ax.set_title('Viralidad promedio según horario de publicación')
     ax.set_xlabel('Hora del día')
     ax.set_ylabel('Virality score promedio')
-    save_plot('viralidad_por_hora.png')
+    save_plot('virality_by_hour.png')
 
     return render_template("index.html",
         total_reels=total_reels,
-        porcentaje_viral=porcentaje_viral,
+        viral_percentage=viral_percentage,
         avg_engagement=avg_engagement,
-        mejor_horario=mejor_horario,
-        plot='viralidad_por_hora.png'
+        best_time=best_time,
+        plot='virality_by_hour.png'
     )
 
-def generate_chart(x, y, type, title, xlabel, ylabel, agg=None):
-    df = pd.read_sql(Reel.query.statement, db.engine)
-    
-    if agg == 'mean':
-        df = df.groupby(x)[y].mean().reset_index()
-    elif agg == 'sum':
-        df = df.groupby(x)[y].sum().reset_index()
-        
-    plt.figure(figsize=(8,5))
-    
-    if type == 'line':
-        plt.plot(df[x], df[y])
-    elif type == 'bar':
-        plt.bar(df[x], df[y])
-    elif type == 'scatter':
-        plt.scatter(df[x], df[y], alpha=0.5)
-    else:
-        raise ValueError("Tipo de gráfico no soportado")
-    
-    plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.tight_layout()
-    plt.savefig(f'static/plots/{title}.png')
-    plt.close() 
-    return str(title + ".png")
-
-@app.route("/juego", methods=["GET"])
-def juego():
-    return render_template("juego.html")
+@app.route("/game", methods=["GET"])
+def game():
+    return render_template("game.html")
 
 @app.route("/audio", methods=["GET"])
 def audio():
     df = get_df()
     fig, ax = plt.subplots(figsize=(6, 4))
     trending_avg = df.groupby('trending_audio')['virality_score'].mean()
-    etiquetas = ['Sin audio trending', 'Con audio trending']
-    ax.bar(etiquetas, trending_avg.values, color=['#405DE6', '#E1306C'])
+    labels = ['Sin audio trending', 'Con audio trending']
+    ax.bar(labels, trending_avg.values, color=['#405DE6', '#E1306C'])
     ax.set_title('Viralidad promedio: audio trending vs no trending')
     ax.set_ylabel('Virality score promedio')
-    save_plot('audio_trending_vs_no.png')
+    save_plot('audio_trending_vs_non_trending.png')
 
     fig, ax = plt.subplots(figsize=(7, 4))
     sample = df.sample(2000, random_state=42)  # muestra para no saturar el scatter
@@ -130,15 +103,15 @@ def audio():
     ax.set_title('Popularidad del audio vs Engagement rate')
     ax.set_xlabel('Audio popularity score')
     ax.set_ylabel('Engagement rate')
-    save_plot('audio_popularidad_vs_engagement.png')
+    save_plot('audio_popularity_vs_engagement.png')
 
-    mejora_porcentual = round(
+    percentage_improvement = round(
         (trending_avg[True] - trending_avg[False]) / trending_avg[False] * 100, 1
     )
     return render_template("audio.html",
-        plot1='audio_trending_vs_no.png',
-        plot2='audio_popularidad_vs_engagement.png',
-        mejora_trending=mejora_porcentual
+        plot1='audio_trending_vs_non_trending.png',
+        plot2='audio_popularity_vs_engagement.png',
+        trending_improvement=percentage_improvement
     )
 
 @app.route("/perfil", methods=["GET"])
@@ -150,34 +123,34 @@ def perfil():
     df['follower_range'] = pd.cut(df['creator_followers'], bins=bins, labels=labels)
 
     fig, ax = plt.subplots(figsize=(8, 4))
-    viral_por_rango = df.groupby('follower_range', observed=True)['virality_score'].mean()
-    ax.bar(viral_por_rango.index, viral_por_rango.values, color='#F77737')
+    viral_by_range = df.groupby('follower_range', observed=True)['virality_score'].mean()
+    ax.bar(viral_by_range.index, viral_by_range.values, color='#F77737')
     ax.set_title('Viralidad promedio según cantidad de seguidores')
     ax.set_xlabel('Rango de seguidores')
     ax.set_ylabel('Virality score promedio')
-    save_plot('perfil_seguidores_viralidad.png')
+    save_plot('profile_followers_virality.png')
 
     # 2. Mejor y peor horario para publicar
     fig, ax = plt.subplots(figsize=(10, 4))
-    viral_por_hora = df.groupby('posting_time')['virality_score'].mean()
-    colores = ['#E1306C' if v == viral_por_hora.max() else
-            '#405DE6' if v == viral_por_hora.min() else '#AAAAAA'
-        for v in viral_por_hora.values]
-    ax.bar(viral_por_hora.index, viral_por_hora.values, color=colores)
+    viral_by_hour = df.groupby('posting_time')['virality_score'].mean()
+    colors = ['#E1306C' if v == viral_by_hour.max() else
+            '#405DE6' if v == viral_by_hour.min() else '#AAAAAA'
+        for v in viral_by_hour.values]
+    ax.bar(viral_by_hour.index, viral_by_hour.values, color=colors)
     ax.set_title('Viralidad promedio por horario (rojo=mejor, azul=peor)')
     ax.set_xlabel('Hora')
     ax.set_ylabel('Virality score promedio')
-    save_plot('perfil_horario.png')
+    save_plot('profile_time.png')
 
-    mejor_hora = int(viral_por_hora.idxmax())
-    peor_hora = int(viral_por_hora.idxmin())
+    best_hour = int(viral_by_hour.idxmax())
+    worst_hour = int(viral_by_hour.idxmin())
 
 
     return render_template("perfil.html",
-        plot1='perfil_seguidores_viralidad.png',
-        plot2='perfil_horario.png',
-        mejor_hora=mejor_hora,
-        peor_hora=peor_hora
+        plot1='profile_followers_virality.png',
+        plot2='profile_time.png',
+        best_hour=best_hour,
+        worst_hour=worst_hour
     )
 
 @app.route("/imagen")
@@ -185,34 +158,34 @@ def imagen():
     df = get_df()
     bins = [0, 15, 30, 60, 90, float('inf')]
     labels = ['0-15s', '15-30s', '30-60s', '60-90s', '90s+']
-    df['duracion_rango'] = pd.cut(df['reel_length_sec'], bins=bins, labels=labels)
+    df['duration_range'] = pd.cut(df['reel_length_sec'], bins=bins, labels=labels)
 
     fig, ax = plt.subplots(figsize=(8, 4))
-    viral_duracion = df.groupby('duracion_rango', observed=True)['virality_score'].mean()
-    ax.bar(viral_duracion.index, viral_duracion.values, color='#FCAF45')
+    viral_duration = df.groupby('duration_range', observed=True)['virality_score'].mean()
+    ax.bar(viral_duration.index, viral_duration.values, color='#FCAF45')
     ax.set_title('Viralidad según duración del reel')
     ax.set_xlabel('Duración')
     ax.set_ylabel('Virality score promedio')
-    save_plot('imagen_duracion.png')
+    save_plot('image_duration.png')
 
     # 2. Calidad de video vs gancho inicial (¿qué importa más?)
     fig, ax = plt.subplots(figsize=(7, 4))
-    corr_calidad = df['video_quality_score'].corr(df['virality_score'])
-    corr_gancho = df['hook_strength_score'].corr(df['virality_score'])
-    corr_edicion = df['editing_quality_score'].corr(df['virality_score'])
-    factores = ['Calidad de video', 'Gancho inicial', 'Calidad de edición']
-    correlaciones = [corr_calidad, corr_gancho, corr_edicion]
-    colores = ['#E1306C' if c == max(correlaciones) else '#AAAAAA' for c in correlaciones]
-    ax.barh(factores, correlaciones, color=colores)
+    corr_quality = df['video_quality_score'].corr(df['virality_score'])
+    corr_hook = df['hook_strength_score'].corr(df['virality_score'])
+    corr_editing = df['editing_quality_score'].corr(df['virality_score'])
+    factors = ['Calidad de video', 'Gancho inicial', 'Calidad de edición']
+    correlations = [corr_quality, corr_hook, corr_editing]
+    colors = ['#E1306C' if c == max(correlations) else '#AAAAAA' for c in correlations]
+    ax.barh(factors, correlations, color=colors)
     ax.set_title('¿Qué factor visual impacta más en la viralidad?')
     ax.set_xlabel('Correlación con virality score')
-    save_plot('imagen_factores.png')
+    save_plot('image_factors.png')
 
     return render_template("imagen.html",
-        plot1='imagen_duracion.png',
-        plot2='imagen_factores.png',
-        corr_gancho=round(corr_gancho, 3),
-        corr_calidad=round(corr_calidad, 3)
+        plot1='image_duration.png',
+        plot2='image_factors.png',
+        corr_hook=round(corr_hook, 3),
+        corr_quality=round(corr_quality, 3)
     )
 
 @app.route("/interacciones")
@@ -222,30 +195,30 @@ def interacciones():
     # 1. Likes / guardados / compartidos por horario
     fig, ax = plt.subplots(figsize=(10, 5))
     for col, color in [('likes', '#E1306C'), ('saves', '#405DE6'), ('shares', '#F77737')]:
-        serie = df.groupby('posting_time')[col].mean()
-        ax.plot(serie.index, serie.values, label=col.capitalize(), color=color)
+        series = df.groupby('posting_time')[col].mean()
+        ax.plot(series.index, series.values, label=col.capitalize(), color=color)
     ax.set_title('Interacciones promedio por horario')
     ax.set_xlabel('Hora del día')
     ax.set_ylabel('Cantidad promedio')
     ax.legend()
-    save_plot('interacciones_horario.png')
+    save_plot('interactions_time.png')
 
     # 2. ¿Qué tipo de interacción lleva más a Explorar?
     fig, ax = plt.subplots(figsize=(8, 4))
-    metricas = ['likes', 'comments', 'shares', 'saves']
-    correlaciones = [df[m].corr(df['explore_page_boost'].astype(int)) for m in metricas]
-    colores = ['#E1306C' if c == max(correlaciones) else '#AAAAAA' for c in correlaciones]
-    ax.bar([m.capitalize() for m in metricas], correlaciones, color=colores)
+    metrics = ['likes', 'comments', 'shares', 'saves']
+    correlations = [df[m].corr(df['explore_page_boost'].astype(int)) for m in metrics]
+    colors = ['#E1306C' if c == max(correlations) else '#AAAAAA' for c in correlations]
+    ax.bar([m.capitalize() for m in metrics], correlations, color=colors)
     ax.set_title('¿Qué interacción predice mejor aparecer en Explorar?')
     ax.set_ylabel('Correlación con explore_page_boost')
-    save_plot('interacciones_explorar.png')
+    save_plot('interactions_explore.png')
 
-    mejor_interaccion = metricas[correlaciones.index(max(correlaciones))].capitalize()
+    best_interaction = metrics[correlations.index(max(correlations))].capitalize()
 
     return render_template("interacciones.html",
-        plot1='interacciones_horario.png',
-        plot2='interacciones_explorar.png',
-        mejor_interaccion=mejor_interaccion
+        plot1='interactions_time.png',
+        plot2='interactions_explore.png',
+        best_interaction=best_interaction
     )
 
 @app.route("/caption")  
@@ -255,15 +228,15 @@ def caption():
     # 1. Longitud del caption vs completion rate
     bins = [0, 50, 150, 300, float('inf')]
     labels = ['Corto (<50)', 'Medio (50-150)', 'Largo (150-300)', 'Muy largo (300+)']
-    df['caption_rango'] = pd.cut(df['caption_length'], bins=bins, labels=labels)
+    df['caption_range'] = pd.cut(df['caption_length'], bins=bins, labels=labels)
 
     fig, ax = plt.subplots(figsize=(8, 4))
-    completion_caption = df.groupby('caption_rango', observed=True)['completion_rate'].mean()
+    completion_caption = df.groupby('caption_range', observed=True)['completion_rate'].mean()
     ax.bar(completion_caption.index, completion_caption.values, color='#833AB4')
     ax.set_title('Tasa de completion según longitud del caption')
     ax.set_xlabel('Longitud del caption')
     ax.set_ylabel('Completion rate promedio')
-    save_plot('caption_longitud.png')
+    save_plot('caption_length.png')
 
     # 2. Cantidad de hashtags vs non_follower_reach_ratio
     fig, ax = plt.subplots(figsize=(8, 4))
@@ -275,7 +248,7 @@ def caption():
     save_plot('caption_hashtags.png')
 
     return render_template("caption.html",
-        plot1='caption_longitud.png',
+        plot1='caption_length.png',
         plot2='caption_hashtags.png'
     )
 

@@ -4,13 +4,22 @@
 <div class="text-center mb-5">
     <h2 class="fw-bold">Interacciones y Engagement</h2>
     <p class="text-muted">Likes, comentarios, compartidos y guardados.</p>
+    <div class="alert alert-info d-inline-block mt-3 shadow-sm border-0">
+        La interacción que más predice aparecer en Explorar es: <strong>{{ best_interaction }}</strong>.
+    </div>
 </div>
 
-<div class="row">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm p-5 text-center chart-placeholder">
-            <img src="{{ url_for('static', filename='plots/' + plot1) }}" alt="Interacciones por horario">
-            <p>La interacción que más predice aparecer en Explorar es: <strong>{{ mejor_interaccion }}</strong></p>
+<div class="row g-4 mb-5">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm p-4 text-center h-100">
+            <h5 class="mb-3 fw-bold">Interacciones por Horario</h5>
+            <img src="{{ url_for('static', filename='plots/' + plot1) }}" alt="Interacciones por horario" class="img-fluid rounded">
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm p-4 text-center h-100">
+            <h5 class="mb-3 fw-bold">Predicción para Explorar</h5>
+            <img src="{{ url_for('static', filename='plots/' + plot2) }}" alt="Explorar Predictor" class="img-fluid rounded">
         </div>
     </div>
 </div>
