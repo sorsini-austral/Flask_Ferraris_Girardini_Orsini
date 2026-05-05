@@ -19,22 +19,22 @@
 
             <ul class="nav justify-content-center">
                 <li class="nav-item">
-                    <a class="nav-link text-dark fw-semibold" href="/">Inicio</a>
+                    <a class="nav-link text-dark fw-semibold {% if request.path == '/' %}active{% endif %}" href="/">Inicio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark fw-semibold" href="/perfil">Perfil</a>
+                    <a class="nav-link text-dark fw-semibold {% if request.path == '/perfil' %}active{% endif %}" href="/perfil">Perfil</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark fw-semibold" href="/audio">Audio</a>
+                    <a class="nav-link text-dark fw-semibold {% if request.path == '/audio' %}active{% endif %}" href="/audio">Audio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark fw-semibold" href="/imagen">Imagen</a>
+                    <a class="nav-link text-dark fw-semibold {% if request.path == '/imagen' %}active{% endif %}" href="/imagen">Imagen</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark fw-semibold" href="/interacciones">Interacciones</a>
+                    <a class="nav-link text-dark fw-semibold {% if request.path == '/interacciones' %}active{% endif %}" href="/interacciones">Interacciones</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark fw-semibold" href="/caption">Caption</a>
+                    <a class="nav-link text-dark fw-semibold {% if request.path == '/caption' %}active{% endif %}" href="/caption">Caption</a>
                 </li>
             </ul>
         </div>

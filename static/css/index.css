@@ -29,3 +29,53 @@ body {
     transform: scale(1.05);
     color: white !important;
 }
+
+/* Navbar Links */
+.nav-link {
+    transition: all 0.3s ease;
+    border-bottom: 2px solid transparent;
+    padding-bottom: 4px;
+    margin: 0 5px;
+}
+
+.nav-link:hover {
+    color: #e6683c !important; /* Color de la paleta de Instagram */
+}
+
+.nav-link.active {
+    color: #cc2366 !important; /* Color resaltado para activo */
+    border-bottom: 2px solid #cc2366;
+    font-weight: 700 !important;
+}
+
+/* Stat Cards (Index) */
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(220, 39, 67, 0.15) !important;
+    border-color: rgba(220, 39, 67, 0.3);
+}
+
+.stat-icon {
+    font-size: 2.2rem;
+}
+
+.stat-value {
+    font-size: 2rem;
+    background: var(--ig-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+}
+
+.stat-label {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
