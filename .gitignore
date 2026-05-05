@@ -39,8 +39,5 @@ htmlcov/
 *.swp
 *.swo
 
-# macOS
-.DS_Store
-
 # Logs
 *.log
