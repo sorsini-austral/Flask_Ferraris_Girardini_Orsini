@@ -2,10 +2,10 @@
 
 {% block content %}
 <div class="text-center mb-5">
-    <h2 class="fw-bold">Análisis del Perfil</h2>
-    <p class="text-muted">¿Importa la cantidad de seguidores del creador?</p>
+    <h2 class="fw-bold">El peso de tu cuenta</h2>
+    <p class="text-muted">¿Hace falta tener un millón de seguidores antes de publicar para que te vaya bien?</p>
     <div class="alert alert-info d-inline-block mt-3 shadow-sm border-0">
-        El mejor horario para publicar es a las <strong>{{ best_hour }}:00</strong> y el peor es a las <strong>{{ worst_hour }}:00</strong>.
+        Para tener en cuenta: la mejor hora para subir un reel es a las <strong>{{ best_hour }}:00</strong>, y la peor, lejos, es a las <strong>{{ worst_hour }}:00</strong>.
     </div>
 </div>
 
@@ -13,13 +13,23 @@
     <div class="col-md-6">
         <div class="card border-0 shadow-sm p-4 text-center h-100">
             <h5 class="mb-3 fw-bold">Seguidores vs Viralidad</h5>
-            <img src="{{ url_for('static', filename='plots/' + plot1) }}" alt="Seguidores vs Viralidad" class="img-fluid rounded">
+            <img src="{{ url_for('static', filename='plots/' + plot1) }}" alt="Seguidores vs Viralidad"
+                class="img-fluid rounded">
         </div>
     </div>
     <div class="col-md-6">
         <div class="card border-0 shadow-sm p-4 text-center h-100">
             <h5 class="mb-3 fw-bold">Desempeño por Horario</h5>
             <img src="{{ url_for('static', filename='plots/' + plot2) }}" alt="Horarios" class="img-fluid rounded">
+        </div>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm p-4 text-center h-100">
+            <h5 class="mb-3 fw-bold">Seguidores vs Alcance Real</h5>
+            <img src="{{ url_for('static', filename='plots/' + plot3) }}" alt="Seguidores vs Alcance" class="img-fluid rounded">
         </div>
     </div>
 </div>
