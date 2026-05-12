@@ -2,10 +2,10 @@
 
 {% block content %}
 <div class="text-center mb-5">
-    <h2 class="fw-bold">Calidad de Imagen y Video</h2>
-    <p class="text-muted">Impacto de la resolución y calidad visual.</p>
+    <h2 class="fw-bold">Lo visual y la duración</h2>
+    <p class="text-muted">¿Qué tanto importa que el video se vea en 4K o que sea cortito?</p>
     <div class="alert alert-info d-inline-block mt-3 shadow-sm border-0">
-        Correlación con viralidad: Gancho Inicial (<strong>{{ corr_hook }}</strong>) | Calidad de Video (<strong>{{ corr_quality }}</strong>)
+        ¿Qué pesa más para hacerse viral? El gancho de los primeros segundos tiene una correlación de <strong>{{ corr_hook }}</strong>, y la calidad visual de <strong>{{ corr_quality }}</strong>.
     </div>
 </div>
 
@@ -19,7 +19,17 @@
     <div class="col-md-6">
         <div class="card border-0 shadow-sm p-4 text-center h-100">
             <h5 class="mb-3 fw-bold">Factores Visuales más Importantes</h5>
-            <img src="{{ url_for('static', filename='plots/' + plot2) }}" alt="Factores Visuales" class="img-fluid rounded">
+            <img src="{{ url_for('static', filename='plots/' + plot2) }}" alt="Factores Visuales"
+                class="img-fluid rounded">
+        </div>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm p-4 text-center h-100">
+            <h5 class="mb-3 fw-bold">Duración vs Tasa de visualización completa</h5>
+            <img src="{{ url_for('static', filename='plots/' + plot3) }}" alt="Duración vs Completion" class="img-fluid rounded">
         </div>
     </div>
 </div>

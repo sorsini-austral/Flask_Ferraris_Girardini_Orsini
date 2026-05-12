@@ -2,10 +2,10 @@
 
 {% block content %}
 <div class="text-center mb-5">
-    <h2 class="fw-bold">Interacciones y Engagement</h2>
-    <p class="text-muted">Likes, comentarios, compartidos y guardados.</p>
+    <h2 class="fw-bold">Interacciones</h2>
+    <p class="text-muted">¿De qué te sirve realmente que te guarden o te comenten el video?</p>
     <div class="alert alert-info d-inline-block mt-3 shadow-sm border-0">
-        La interacción que más predice aparecer en Explorar es: <strong>{{ best_interaction }}</strong>.
+        Un dato loco: la interacción que más te ayuda a aparecer en la lupita (Explorar) es: <strong>{{ best_interaction }}</strong>.
     </div>
 </div>
 
@@ -13,13 +13,24 @@
     <div class="col-md-6">
         <div class="card border-0 shadow-sm p-4 text-center h-100">
             <h5 class="mb-3 fw-bold">Interacciones por Horario</h5>
-            <img src="{{ url_for('static', filename='plots/' + plot1) }}" alt="Interacciones por horario" class="img-fluid rounded">
+            <img src="{{ url_for('static', filename='plots/' + plot1) }}" alt="Interacciones por horario"
+                class="img-fluid rounded">
         </div>
     </div>
     <div class="col-md-6">
         <div class="card border-0 shadow-sm p-4 text-center h-100">
             <h5 class="mb-3 fw-bold">Predicción para Explorar</h5>
-            <img src="{{ url_for('static', filename='plots/' + plot2) }}" alt="Explorar Predictor" class="img-fluid rounded">
+            <img src="{{ url_for('static', filename='plots/' + plot2) }}" alt="Explorar Predictor"
+                class="img-fluid rounded">
+        </div>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm p-4 text-center h-100">
+            <h5 class="mb-3 fw-bold">Impacto de la pestaña "Explorar"</h5>
+            <img src="{{ url_for('static', filename='plots/' + plot3) }}" alt="Explorar vs Alcance" class="img-fluid rounded">
         </div>
     </div>
 </div>
