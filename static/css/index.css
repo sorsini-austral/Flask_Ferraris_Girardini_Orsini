@@ -4,7 +4,7 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #fafafa !important; 
+    background-color: #fafafa !important;
 }
 
 .custom-gradient-text {
@@ -16,7 +16,7 @@ body {
     color: transparent;
 }
 
-/* Botón del Mini Juego */
+/* Game Button */
 .btn-game {
     background: var(--ig-gradient);
     border-radius: 50px;
@@ -32,50 +32,47 @@ body {
 
 /* Navbar Links */
 .nav-link {
+    font-size: 1.1rem;
     transition: all 0.3s ease;
     border-bottom: 2px solid transparent;
     padding-bottom: 4px;
-    margin: 0 5px;
+    margin: 0 3px;
+    padding-left: 0.6rem !important;
+    padding-right: 0.6rem !important;
 }
 
 .nav-link:hover {
-    color: #e6683c !important; /* Color de la paleta de Instagram */
+    color: #e6683c !important;
 }
 
 .nav-link.active {
-    color: #cc2366 !important; /* Color resaltado para activo */
+    color: #cc2366 !important;
     border-bottom: 2px solid #cc2366;
     font-weight: 700 !important;
 }
 
-/* Stat Cards (Index) */
-.stat-card {
-    background: white;
-    border-radius: 16px;
-    border: 1px solid rgba(0,0,0,0.05);
-    transition: all 0.3s ease;
+/* VS Cards (Index) */
+.normal-card {
+    border-top: 5px solid #AAAAAA !important;
 }
 
-.stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(220, 39, 67, 0.15) !important;
-    border-color: rgba(220, 39, 67, 0.3);
+.viral-card {
+    border-top: 5px solid #E1306C !important;
 }
 
-.stat-icon {
-    font-size: 2.2rem;
+/* Category ranking */
+.ranking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
 }
 
-.stat-value {
-    font-size: 2rem;
-    background: var(--ig-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
+.ranking-progress-bg {
+    height: 12px;
+    background-color: #f1f3f5;
 }
 
-.stat-label {
-    font-size: 0.95rem;
-    font-weight: 500;
-}
+.bg-rank-1 { background-color: #E1306C !important; }
+.bg-rank-2 { background-color: #f09433 !important; }
+.bg-rank-3 { background-color: #bc1888 !important; }

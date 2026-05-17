@@ -3,55 +3,199 @@
 {% block content %}
 <div class="text-center my-5">
     <h2 class="fw-bold mb-3">Análisis de Reels</h2>
-    <p class="text-muted lead mb-4">¿Querés saber por qué algunos reels se viralizan y otros no los ve nadie? Te invitamos a ver todos los factores influyentes</p>
+    <p class="text-muted lead">¿Querés saber por qué algunos reels se viralizan y otros no los ve nadie?</p>
+    <p class="text-muted">Te invitamos a descubrirlo a partir de este análisis de miles de reels</p>
+</div>
+
+<!-- General stats from database -->
+<div class="d-flex justify-content-center align-items-center gap-2 gap-md-4 flex-wrap mb-5 pb-3 border-bottom">
+    <div class="text-center px-2 px-md-4">
+        <h2 class="fw-bold mb-0" style="color: #e6683c;">{{ total_reels }}</h2>
+        <small class="text-muted text-uppercase fw-bold" style="letter-spacing: 1px; font-size: 0.8rem;">Reels
+            analizados</small>
+    </div>
+    <div class="border-end d-none d-md-block" style="height: 40px;"></div>
+    <div class="text-center px-2 px-md-4">
+        <h2 class="fw-bold mb-0" style="color: #cc2366;">{{ viral_percentage }}%</h2>
+        <small class="text-muted text-uppercase fw-bold" style="letter-spacing: 1px; font-size: 0.8rem;">Logran
+            viralizarse</small>
+    </div>
+</div>
+
+<div class="row justify-content-center mb-5 mt-5">
+    <div class="col-md-10 text-center">
+        <p class="text-muted lead mb-3">La viralidad no depende de un solo factor, sino que es el resultado de muchas
+            variables. Todo reel viral parece seguir un mismo recorrido: desde captar atención en los primeros segundos
+            hasta aparecer en explorar.</p>
+        <p class="text-dark fw-bold fs-5">Te animamos a recorrer la página usando el menú superior para ver en detalle
+            qué es lo que más influye</p>
+    </div>
+</div>
+
+<!-- General data and relevant info from database -->
+<div class="row mb-5 justify-content-center mt-5">
+    <h3 class="fw-bold mb-4 text-center">¿Sabías qué...?</h3>
+    <div class="col-md-8">
+        <div class="row g-4 text-start">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100 p-4 rounded-4">
+                    <h5 class="fw-bold" style="color: #bc1888;">Mejor horario 🕒</h5>
+                    <p class="text-muted mb-0 mt-2">El horario pico donde los reels obtienen mayor viralidad general es
+                        a las <strong>{{ best_time }}:00 hs</strong>.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100 p-4 rounded-4">
+                    <h5 class="fw-bold" style="color: #f09433;">El algoritmo ama... 💬</h5>
+                    <p class="text-muted mb-0 mt-2"><strong>{{ best_interaction }}</strong> son la interacción que más
+                        fuertemente empuja tu video a la página de Explorar.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100 p-4 rounded-4">
+                    <h5 class="fw-bold" style="color: #e6683c;">El gancho 🎣</h5>
+                    <p class="text-muted mb-0 mt-2">Los reels con hooks fuertes muestran una retención
+                        significativamente mayor, promediando un <strong>{{ high_hook_retention }}%</strong> de
+                        retención final.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100 p-4 rounded-4">
+                    <h5 class="fw-bold" style="color: #dc2743;">Retención ⏱️</h5>
+                    <p class="text-muted mb-0 mt-2">Los reels con mayor tasa de viralidad mantienen a la audiencia
+                        mirando durante más tiempo (<strong>{{ viral_stats.retention }}%</strong> de retención vs {{
+                        non_viral_stats.retention }}% normales).</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100 p-4 rounded-4">
+                    <h5 class="fw-bold" style="color: #405DE6;">Explorar 🔍</h5>
+                    <p class="text-muted mb-0 mt-2">La mayoría de los reels virales obtienen gran parte de su alcance
+                        desde usuarios no seguidores (<strong>{{ viral_non_follower_reach }}%</strong> de su alcance
+                        total).</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100 p-4 rounded-4">
+                    <h5 class="fw-bold" style="color: #F77737;">Audio viral 🎵</h5>
+                    <p class="text-muted mb-0 mt-2">Los reels con audio en tendencia tienden a recibir muchas más
+                        impresiones iniciales que el resto.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Category Ranking -->
+<div class="row mt-5 pt-3 mb-5 justify-content-center">
+    <h3 class="fw-bold mb-5 text-center">Ranking de Categorías más Virales</h3>
+    <div class="col-md-7">
+        <!-- Puesto 1 -->
+        <div class="mb-4">
+            <div class="ranking-header">
+                <span class="fw-bold fs-5 text-dark">🥇 {{ cat1_name }}</span>
+                <span class="text-muted fw-bold">{{ cat1_score }} pts</span>
+            </div>
+            <div class="progress shadow-sm ranking-progress-bg">
+                <div class="progress-bar rounded-pill bg-rank-1" style="width: {{ cat1_score }}%;"></div>
+            </div>
+        </div>
+
+        <!-- Puesto 2 -->
+        <div class="mb-4">
+            <div class="ranking-header">
+                <span class="fw-bold fs-5 text-dark">🥈 {{ cat2_name }}</span>
+                <span class="text-muted fw-bold">{{ cat2_score }} pts</span>
+            </div>
+            <div class="progress shadow-sm ranking-progress-bg">
+                <div class="progress-bar rounded-pill bg-rank-2" style="width: {{ cat2_score }}%;"></div>
+            </div>
+        </div>
+
+        <!-- Puesto 3 -->
+        <div class="mb-4">
+            <div class="ranking-header">
+                <span class="fw-bold fs-5 text-dark">🥉 {{ cat3_name }}</span>
+                <span class="text-muted fw-bold">{{ cat3_score }} pts</span>
+            </div>
+            <div class="progress shadow-sm ranking-progress-bg">
+                <div class="progress-bar rounded-pill bg-rank-3" style="width: {{ cat3_score }}%;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Non viral reel vs viral reel -->
+<!-- Non viral -->
+<div class="row mt-5 pt-5 mb-5 pb-4 justify-content-center">
+    <h3 class="fw-bold mb-5 text-center">¿Qué diferencia a un reel viral de uno normal?</h3>
+    <div class="col-md-5">
+        <div class="card border-0 shadow-sm normal-card">
+            <div class="card-body text-center p-4">
+                <h4 class="fw-bold text-muted mb-4">Reel Normal</h4>
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                    <span class="text-muted">Gancho Inicial:</span>
+                    <span class="fw-bold">{{ non_viral_stats.hook }}%</span>
+                </div>
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                    <span class="text-muted">Retención:</span>
+                    <span class="fw-bold">{{ non_viral_stats.retention }}%</span>
+                </div>
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                    <span class="text-muted">Engagement:</span>
+                    <span class="fw-bold">{{ non_viral_stats.engagement }}%</span>
+                </div>
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                    <span class="text-muted">Aparición en Explorar:</span>
+                    <span class="fw-bold">{{ non_viral_stats.explore }}%</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">Duración Promedio:</span>
+                    <span class="fw-bold">{{ non_viral_stats.duration }}s</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2 d-flex align-items-center justify-content-center my-4 my-md-0">
+        <h1 class="fw-bold text-muted">VS</h1>
+    </div>
+
+    <!-- Viral -->
+    <div class="col-md-5">
+        <div class="card border-0 shadow-sm viral-card">
+            <div class="card-body text-center p-4">
+                <h4 class="fw-bold text-danger mb-4">Reel Viral 🔥</h4>
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                    <span class="text-muted">Gancho Inicial:</span>
+                    <span class="fw-bold text-danger">{{ viral_stats.hook }}%</span>
+                </div>
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                    <span class="text-muted">Retención:</span>
+                    <span class="fw-bold text-danger">{{ viral_stats.retention }}%</span>
+                </div>
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                    <span class="text-muted">Engagement:</span>
+                    <span class="fw-bold text-danger">{{ viral_stats.engagement }}%</span>
+                </div>
+                <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                    <span class="text-muted">Aparición en Explorar:</span>
+                    <span class="fw-bold text-danger">{{ viral_stats.explore }}%</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">Duración Promedio:</span>
+                    <span class="fw-bold text-danger">{{ viral_stats.duration }}s</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Game -->
+<div class="text-center mt-5 pt-5 mb-3 pb-3">
+    <h4 class="fw-bold mb-5">Descubrí qué podría pasar con el tuyo...</h4>
     <a href="/game" class="btn px-5 py-3 fw-bold shadow btn-game mb-5">
-        🎮 Probalo vos: ¿Tu Reel se haría viral?
+        🎮 Simulador: ¿Tu Reel se haría viral?
     </a>
-</div>
-
-<div class="row text-center mb-4">
-    <div class="col-md-3">
-        <div class="card shadow-sm border-0 py-3">
-            <h5 class="text-muted">Total Reels</h5>
-            <h3 class="fw-bold text-primary">{{ total_reels }}</h3>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card shadow-sm border-0 py-3">
-            <h5 class="text-muted">% Virales</h5>
-            <h3 class="fw-bold text-success">{{ viral_percentage }}%</h3>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card shadow-sm border-0 py-3">
-            <h5 class="text-muted">Avg Engagement</h5>
-            <h3 class="fw-bold text-info">{{ avg_engagement }}%</h3>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card shadow-sm border-0 py-3">
-            <h5 class="text-muted">Mejor Horario</h5>
-            <h3 class="fw-bold text-danger">{{ best_time }}:00</h3>
-        </div>
-    </div>
-</div>
-
-<div class="row mb-5">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm p-4 text-center">
-            <h5 class="mb-3 fw-bold">Viralidad a lo largo del día</h5>
-            <img src="{{ url_for('static', filename='plots/' + plot) }}" alt="Viralidad por hora"
-                class="img-fluid rounded">
-        </div>
-    </div>
-</div>
-
-<div class="row mb-5">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm p-4 text-center h-100">
-            <h5 class="mb-3 fw-bold">Viralidad por Categoría</h5>
-            <img src="{{ url_for('static', filename='plots/' + plot2) }}" alt="Viralidad por Categoría" class="img-fluid rounded">
-        </div>
-    </div>
 </div>
 {% endblock %}

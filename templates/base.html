@@ -13,10 +13,9 @@
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
     
-    <nav class="navbar bg-white custom-navbar shadow-sm mb-4 py-3">
+    <nav class="navbar bg-white custom-navbar shadow-sm mb-4 py- sticky-top">
         <div class="container d-flex flex-column align-items-center">
-            <span class="navbar-brand fw-bold mb-3 h1 custom-gradient-text">¿Qué hace que un reel sea viral?</span>
-
+            <span class="navbar-brand fw-bold mb-2 h1 custom-gradient-text">¿Qué hace que un reel sea viral?</span>
             <ul class="nav justify-content-center">
                 <li class="nav-item">
                     <a class="nav-link text-dark fw-semibold {% if request.path == '/' %}active{% endif %}" href="/">Inicio</a>
@@ -25,10 +24,16 @@
                     <a class="nav-link text-dark fw-semibold {% if request.path == '/perfil' %}active{% endif %}" href="/perfil">Perfil</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link text-dark fw-semibold {% if request.path == '/timing' %}active{% endif %}" href="/timing">Timing</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link text-dark fw-semibold {% if request.path == '/audio' %}active{% endif %}" href="/audio">Audio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark fw-semibold {% if request.path == '/imagen' %}active{% endif %}" href="/imagen">Imagen</a>
+                    <a class="nav-link text-dark fw-semibold {% if request.path == '/visual' %}active{% endif %}" href="/visual">Visual</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark fw-semibold {% if request.path == '/categorias' %}active{% endif %}" href="/categorias">Categorías</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-dark fw-semibold {% if request.path == '/interacciones' %}active{% endif %}" href="/interacciones">Interacciones</a>

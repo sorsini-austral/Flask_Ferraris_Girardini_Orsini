@@ -13,6 +13,10 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 @app.after_request
 def add_header(response):
+    """
+    Prevents the browser from caching the response by setting appropriate HTTP headers.
+    This ensures that users always see the most recent data and static assets.
+    """
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '-1'
@@ -52,6 +56,11 @@ class Reel(db.Model):
 _df_cache = None
 
 def get_df():
+    """
+    Retrieves the reels dataset from the SQLite database and caches it in memory.
+    It performs data cleaning by scaling percentage columns and sanitizing/translating 
+    the categorical 'category' values into a standard Spanish format.
+    """
     global _df_cache
     if _df_cache is None:
         _df_cache = pd.read_sql(Reel.query.statement, db.engine)
@@ -62,33 +71,24 @@ def get_df():
             if col in _df_cache.columns:
                 _df_cache[col] = _df_cache[col] * 100
                 
-        # Limpieza de categorías
         if 'category' in _df_cache.columns:
             _df_cache['category'] = _df_cache['category'].astype(str).str.lower().str.strip()
             replacements = {
-                'travel': 'viajes',
-                'food': 'comida',
-                'fod': 'comida',
-                'education': 'educación',
-                'educacion': 'educación',
-                'edu': 'educación',
-                'beauty': 'belleza',
-                'beuty': 'belleza',
-                'music': 'música',
-                'musica': 'música',
-                'comedy': 'comedia',
-                'tech': 'tecnología',
-                'tecnologia': 'tecnología',
-                'fashion': 'moda',
-                'fitnes': 'fitness',
-                'gym': 'fitness',
-                'gamig': 'gaming'
+                'travel': 'viajes', 'food': 'comida', 'fod': 'comida',
+                'education': 'educación', 'educacion': 'educación', 'edu': 'educación',
+                'beauty': 'belleza', 'beuty': 'belleza', 'music': 'música', 'musica': 'música',
+                'comedy': 'comedia', 'tech': 'tecnología', 'tecnologia': 'tecnología',
+                'fashion': 'moda', 'fitnes': 'fitness', 'gym': 'fitness', 'gamig': 'gaming', 'gaming': 'gaming'
             }
             _df_cache['category'] = _df_cache['category'].replace(replacements).str.capitalize()
             
     return _df_cache
 
 def save_plot(filename):
+    """
+    Helper function to save generated matplotlib figures to the 'static/plots' directory.
+    Ensures the layout is tight before saving and properly closes the plot to free memory.
+    """
     os.makedirs('static/plots', exist_ok=True)
     plt.tight_layout()
     plt.savefig(f'static/plots/{filename}', dpi=100)
@@ -96,48 +96,92 @@ def save_plot(filename):
 
 @app.route("/", methods=["GET"])
 def index():
+    """
+    Renders the main dashboard page.
+    Calculates general statistics (total reels, viral percentage, average engagement, best posting time)
+    and extracts key metric comparisons between viral (score > 70) and non-viral reels.
+    """
     df = get_df()
-    # Stat cards para mostrar en el HTML
     total_reels = len(df)
-    virals = df[df['virality_score'] > 70]  # ajustá el umbral según el dataset
+    virals = df[df['virality_score'] > 70]
+    non_virals = df[df['virality_score'] <= 70]
+    
     viral_percentage = round(len(virals) / total_reels * 100, 1) if total_reels > 0 else 0
     avg_engagement = round(df['engagement_rate'].mean(), 2)
     
-    df_plot = df.sample(200, random_state=42)
-    best_time = int(df_plot.groupby('posting_time')['virality_score'].mean().idxmax())
+    best_time = int(df.groupby('posting_time')['virality_score'].mean().idxmax())
 
-    # Gráfico: viralidad promedio por horario
-    fig, ax = plt.subplots(figsize=(10, 4))
-    hours = df_plot.groupby('posting_time')['virality_score'].mean()
-    ax.plot(hours.index, hours.values, marker='o', color='#E1306C')
-    ax.set_title('Viralidad promedio según horario de publicación')
-    ax.set_xlabel('Hora del día')
-    ax.set_ylabel('Virality score promedio')
-    save_plot('virality_by_hour.png')
+    # Comparative stats Viral vs No Viral
+    viral_stats = {
+        'hook': round(virals['hook_strength_score'].mean(), 1) if not virals.empty else 0,
+        'retention': round(virals['retention_rate'].mean(), 1) if not virals.empty else 0,
+        'engagement': round(virals['engagement_rate'].mean(), 1) if not virals.empty else 0,
+        'explore': round(virals['explore_page_boost'].mean() * 100, 1) if not virals.empty else 0,
+        'duration': round(virals['reel_length_sec'].mean(), 1) if not virals.empty else 0
+    }
 
-    # Nuevo Gráfico: Categoría vs Virality Score
-    fig, ax = plt.subplots(figsize=(10, 4))
-    cat_virality = df_plot.groupby('category')['virality_score'].mean().sort_values()
-    ax.barh(cat_virality.index.astype(str), cat_virality.values, color='#833AB4')
-    ax.set_title('Viralidad promedio según la categoría del Reel')
-    ax.set_xlabel('Virality score promedio')
-    save_plot('category_virality.png')
+    non_viral_stats = {
+        'hook': round(non_virals['hook_strength_score'].mean(), 1) if not non_virals.empty else 0,
+        'retention': round(non_virals['retention_rate'].mean(), 1) if not non_virals.empty else 0,
+        'engagement': round(non_virals['engagement_rate'].mean(), 1) if not non_virals.empty else 0,
+        'explore': round(non_virals['explore_page_boost'].mean() * 100, 1) if not non_virals.empty else 0,
+        'duration': round(non_virals['reel_length_sec'].mean(), 1) if not non_virals.empty else 0
+    }
+
+    # General data and relevant info
+    interactions = ['likes', 'comments', 'shares', 'saves']
+    best_interaction_key = df[interactions].corrwith(df['explore_page_boost']).idxmax()
+    interaction_names = {'likes': 'Los Likes', 'comments': 'Los Comentarios', 'shares': 'Los Compartidos', 'saves': 'Los Guardados'}
+    best_interaction = interaction_names.get(best_interaction_key, 'Las Interacciones')
+    
+    median_hook = df['hook_strength_score'].median()
+    high_hook_retention = round(df[df['hook_strength_score'] >= median_hook]['retention_rate'].mean(), 1)
+    
+    viral_non_follower_reach = round(virals['non_follower_reach_ratio'].mean(), 1) if not virals.empty else 0
+    
+    audio_trending_impressions = int(df[df['trending_audio'] == True]['impressions'].mean())
+    audio_normal_impressions = int(df[df['trending_audio'] == False]['impressions'].mean())
+
+    # Category Ranking
+    top_categories_series = df.groupby('category')['virality_score'].mean().sort_values(ascending=False).head(3)
+    cats = list(top_categories_series.items())
+    
+    cat1_name, cat1_score = cats[0][0], round(cats[0][1], 1)
+    cat2_name, cat2_score = cats[1][0], round(cats[1][1], 1)
+    cat3_name, cat3_score = cats[2][0], round(cats[2][1], 1)
 
     return render_template("index.html",
         total_reels=total_reels,
         viral_percentage=viral_percentage,
         avg_engagement=avg_engagement,
         best_time=best_time,
-        plot='virality_by_hour.png',
-        plot2='category_virality.png'
+        viral_stats=viral_stats,
+        non_viral_stats=non_viral_stats,
+        best_interaction=best_interaction,
+        high_hook_retention=high_hook_retention,
+        viral_non_follower_reach=viral_non_follower_reach,
+        audio_trending_impressions=audio_trending_impressions,
+        audio_normal_impressions=audio_normal_impressions,
+        cat1_name=cat1_name, cat1_score=cat1_score,
+        cat2_name=cat2_name, cat2_score=cat2_score,
+        cat3_name=cat3_name, cat3_score=cat3_score
     )
 
 @app.route("/game", methods=["GET"])
 def game():
+    """
+    Renders the interactive simulator game page where users can input parameters
+    to predict if their hypothetical reel would become viral.
+    """
     return render_template("game.html")
 
 @app.route("/audio", methods=["GET"])
 def audio():
+    """
+    Renders the audio analysis page.
+    Generates bar and scatter plots to analyze the impact of trending audio 
+    and audio popularity on overall virality and engagement rate.
+    """
     df = get_df()
     df_plot = df.sample(200, random_state=42)
     
@@ -168,6 +212,11 @@ def audio():
 
 @app.route("/perfil", methods=["GET"])
 def perfil():
+    """
+    Renders the profile analysis page.
+    Generates plots to explore how creator follower counts and posting times 
+    correlate with virality and non-follower reach.
+    """
     df = get_df()
     df_plot = df.sample(200, random_state=42)
 
@@ -214,8 +263,13 @@ def perfil():
         worst_hour=worst_hour
     )
 
-@app.route("/imagen")
-def imagen():
+@app.route("/visual")
+def visual():
+    """
+    Renders the video/image quality analysis page.
+    Generates visualizations to understand how video duration, video quality, 
+    and editing quality affect the virality and completion rates of the reels.
+    """
     df = get_df()
     df_plot = df.sample(200, random_state=42)
     
@@ -231,10 +285,10 @@ def imagen():
     ax.set_ylabel('Virality score promedio')
     save_plot('image_duration.png')
 
-    # 2. Calidad de video vs gancho inicial (¿qué importa más?)
+    # Video quality vs hook
     fig, ax = plt.subplots(figsize=(7, 4))
     
-    # Valores fijos realistas ya que el CSV del profesor no tiene correlaciones reales
+    # Realistic fixed values ​​since the CSV has no real correlations
     corr_quality = 0.58
     corr_hook = 0.82
     corr_editing = 0.35
@@ -247,7 +301,7 @@ def imagen():
     ax.set_xlabel('Correlación con virality score')
     save_plot('image_factors.png')
 
-    # Nuevo Gráfico: Duración vs Completion Rate
+    # Duration vs Completion rate
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.scatter(df_plot['reel_length_sec'], df_plot['completion_rate'], alpha=0.6, color='#405DE6', s=20)
     ax.set_title('Duración del Reel vs Tasa de visualización completa')
@@ -255,7 +309,7 @@ def imagen():
     ax.set_ylabel('Completion Rate (%)')
     save_plot('retention_duration.png')
 
-    return render_template("imagen.html",
+    return render_template("visual.html",
         plot1='image_duration.png',
         plot2='image_factors.png',
         plot3='retention_duration.png',
@@ -263,12 +317,44 @@ def imagen():
         corr_quality=round(corr_quality, 3)
     )
 
+@app.route("/timing")
+def timing():
+    """
+    Renders the timing analysis page.
+    (Currently under construction)
+    """
+    return render_template("timing.html")
+
+@app.route("/categorias")
+def categorias():
+    """
+    Renders the category analysis page.
+    Generates a horizontal bar chart showing average virality score by category.
+    """
+    df = get_df()
+    cat_virality = df.groupby('category')['virality_score'].mean().sort_values(ascending=True)
+    
+    fig, ax = plt.subplots(figsize=(8, 6))
+    colors = ['#E1306C' if v == cat_virality.max() else '#f09433' for v in cat_virality.values]
+    cat_virality.plot(kind='barh', color=colors, ax=ax)
+    ax.set_title('Viralidad promedio por Categoría')
+    ax.set_xlabel('Virality Score Promedio')
+    ax.set_ylabel('')
+    save_plot('category_virality.png')
+
+    return render_template("categorias.html", plot='category_virality.png')
+
 @app.route("/interacciones")
 def interacciones():
+    """
+    Renders the interactions analysis page.
+    Plots how different interactions (likes, comments, shares, saves) vary over time 
+    and determines which interaction type correlates the most with the explore page boost.
+    """
     df = get_df()
     df_plot = df.sample(200, random_state=42)
 
-    # 1. Likes / guardados / compartidos por horario
+    # Likes / saved / shared by hour
     fig, ax = plt.subplots(figsize=(10, 5))
     for col, color in [('likes', '#E1306C'), ('saves', '#405DE6'), ('shares', '#F77737')]:
         series = df_plot.groupby('posting_time')[col].mean()
@@ -279,7 +365,7 @@ def interacciones():
     ax.legend()
     save_plot('interactions_time.png')
 
-    # 2. ¿Qué tipo de interacción lleva más a Explorar?
+    # Better interaction
     fig, ax = plt.subplots(figsize=(8, 4))
     metrics = ['likes', 'comments', 'shares', 'saves']
     correlations = [df_plot[m].corr(df_plot['explore_page_boost'].astype(int)) for m in metrics]
@@ -291,7 +377,7 @@ def interacciones():
 
     best_interaction = metrics[correlations.index(max(correlations))].capitalize()
 
-    # Nuevo Gráfico: Impacto de Explorar en alcance a no seguidores
+    # Impact of Explore on reach to non-followers
     fig, ax = plt.subplots(figsize=(10, 4))
     explore_reach = df_plot.groupby('explore_page_boost')['non_follower_reach_ratio'].mean()
     labels = ['No apareció', 'Sí apareció']
@@ -309,10 +395,15 @@ def interacciones():
 
 @app.route("/caption")  
 def caption():
+    """
+    Renders the caption and hashtags analysis page.
+    Generates plots to show the relationship between caption length and completion rate, 
+    as well as hashtag count and non-follower reach ratio.
+    """
     df = get_df()
     df_plot = df.sample(200, random_state=42)
 
-    # 1. Longitud del caption vs completion rate
+    # Caption lenght vs completion rate
     bins = [0, 50, 150, 300, float('inf')]
     labels = ['Corto (<50)', 'Medio (50-150)', 'Largo (150-300)', 'Muy largo (300+)']
     df_plot['caption_range'] = pd.cut(df_plot['caption_length'], bins=bins, labels=labels)
@@ -325,7 +416,7 @@ def caption():
     ax.set_ylabel('Completion rate promedio')
     save_plot('caption_length.png')
 
-    # 2. Cantidad de hashtags vs non_follower_reach_ratio
+    # Hashtags quantity vs non_follower_reach_ratio
     fig, ax = plt.subplots(figsize=(8, 4))
     hashtag_reach = df_plot.groupby('hashtags_count')['non_follower_reach_ratio'].mean()
     ax.plot(hashtag_reach.index, hashtag_reach.values, color='#405DE6', marker='o', markersize=3)
